@@ -22,7 +22,47 @@ interface ApiTask {
 }
 
 function App() {
-  const [error, setError] = useState<string | null>(null); // Stato per l'errore
+
+  // 1. Inizializziamo lo stato leggendo dal LocalStorage (se esiste)
+  const [tasks, setTasks] = useState<Task[]>(() => {
+    const salvate = localStorage.getItem("mie_tasks");
+    return salvate ? JSON.parse(salvate) : [];
+  });
+
+  const [loading, setLoading] = useState<boolean>(tasks.length === 0);
+  const [error, setError] = useState<string | null>(null);
+
+  // 2. Carichiamo dall'API solo se non abbiamo dati salvati localmente
+  useEffect(() => {
+    if (tasks.length > 0) {
+      setLoading(false);
+      return;
+    }
+
+    const fetchTasks = async () => {
+      try {
+        const response = await fetch('https://jsonplaceholder.typicode.com/todos?_limit=5');
+        if (!response.ok) throw new Error("Errore API");
+        const data: ApiTask[] = await response.json();
+        const mapped = data.map(t => ({ id: t.id, titolo: t.title, completato: t.completed }));
+        setTasks(mapped);
+      } catch (err) {
+        setError(err instanceof Error ? err.message : "Errore");
+      } finally {
+        setLoading(false);
+      }
+    };
+    fetchTasks();
+  }, []);
+
+  // 3. SALVATAGGIO AUTOMATICO: Ogni volta che 'tasks' cambia, scrivi nel LocalStorage
+  useEffect(() => {
+    localStorage.setItem("mie_tasks", JSON.stringify(tasks));
+  }, [tasks]); // <--- Questa dipendenza è fondamentale!
+
+
+
+
 
   // Funzione per aggiungere una task
   const addTask = (titolo: string) => {
@@ -34,17 +74,13 @@ function App() {
     setTasks([...tasks, nuovaTask]); // Creiamo un nuovo array con la nuova task
   };
 
-  //inizializziamo lo stato con una lista di task
-  const [tasks, setTasks] = useState<Task[]>([
-    { id: 1, titolo: "Imparare React", completato: false },
-    { id: 2, titolo: "Configurare Docker", completato: true }
-  ]);
+
   const toggleTask = (id: number) => {
     setTasks(tasks.map(t =>
       t.id === id ? { ...t, completato: !t.completato } : t
     ));
   };
-  const [loading, setLoading] = useState<boolean>(true);
+
   useEffect(() => {
     // Funzione asincrona per recuperare i dati
     const fetchTasks = async () => {
