@@ -24,35 +24,36 @@ function App() {
   if (loading) return <p>Caricamento in corso...</p>;
   return (
 
-    <div style={{ padding: '20px' }}>
-      <h1>Le mie Task</h1>
-      // Nel JSX, dopo il div delle tasks:
-      {/* {tasks.some(t => t.completato) && (
-        <button onClick={clearCompleted} style={{ marginTop: '20px', width: '100%' }}>
-          Pulisci completate
-        </button>
-      )} */}
-      {error && (
-        <div style={{ color: 'red', border: '1px solid red', padding: '10px', borderRadius: '5px' }}>
-          <p>⚠️ Ops! {error}</p>
-          <button onClick={() => window.location.reload()}>Riprova</button>
+    <div className="min-h-screen py-12 px-4">
+      <div className="max-w-md mx-auto">
+        <header className="mb-10 text-center">
+          <h1 className="text-4xl font-extrabold text-slate-900 tracking-tight">
+            My Tasks
+          </h1>
+          <p className="text-slate-500 mt-2">Gestisci i tuoi impegni con stile</p>
+        </header>
+
+        <TaskForm onAddTask={addTask} />
+
+        {loading && (
+          <div className="flex justify-center p-10">
+            <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-indigo-600"></div>
+          </div>
+        )}
+
+        {error && (
+          <div className="bg-red-50 text-red-700 p-4 rounded-xl border border-red-100 mb-6">
+            {error}
+          </div>
+        )}
+
+        <div className="space-y-2">
+          {tasks.map(task => (
+            <TaskItem key={task.id} {...task} onToggle={toggleTask} onDelete={deleteTask} />
+          ))}
         </div>
-      )}
-      {/* Usiamo il nuovo form */}
-      <TaskForm onAddTask={addTask} />
-
-      {tasks.map(task => (
-        <TaskItem
-          key={task.id}
-          id={task.id}
-          titolo={task.titolo}
-          completato={task.completato}
-          onToggle={toggleTask}
-          onDelete={deleteTask}
-        />
-      ))}
+      </div>
     </div>
-
   )
 }
 

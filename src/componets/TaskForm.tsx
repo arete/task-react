@@ -16,17 +16,19 @@ export const TaskForm = ({ onAddTask }: TaskFormProps) => {
   };
 
   return (
-    <form onSubmit={handleSubmit} style={{ marginBottom: '20px' }}>
+    <form onSubmit={handleSubmit} className="flex gap-2 mb-8">
       <input
         type="text"
-        placeholder="Cosa devi fare?"
         value={nuovoTitolo}
         onChange={(e) => setNuovoTitolo(e.target.value)}
-        style={{ padding: '8px', marginRight: '10px' }}
+        placeholder="Aggiungi una nuova attività..."
+        className="flex-1 p-3 rounded-xl border border-slate-200 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-transparent shadow-sm"
       />
-      <button type="submit" style={{ padding: '8px 15px', cursor: 'pointer' }}>
+      <button
+        type="submit"
+        className="px-6 py-3 bg-indigo-600 text-white font-semibold rounded-xl hover:bg-indigo-700 shadow-lg shadow-indigo-200 transition-all active:scale-95"
+      >
         Aggiungi
       </button>
-    </form>
-  );
+    </form>);
 };
