@@ -61,8 +61,13 @@ function App() {
   }, [tasks]); // <--- Questa dipendenza è fondamentale!
 
 
-
-
+  const deleteTask = (id: number) => {
+    // Teniamo solo le task che NON hanno l'ID che vogliamo eliminare
+    setTasks(tasks.filter(task => task.id !== id));
+  };
+  const clearCompleted = () => {
+    setTasks(tasks.filter(task => !task.completato));
+  };
 
   // Funzione per aggiungere una task
   const addTask = (titolo: string) => {
@@ -123,6 +128,12 @@ function App() {
 
     <div style={{ padding: '20px' }}>
       <h1>Le mie Task</h1>
+      // Nel JSX, dopo il div delle tasks:
+      {tasks.some(t => t.completato) && (
+        <button onClick={clearCompleted} style={{ marginTop: '20px', width: '100%' }}>
+          Pulisci completate
+        </button>
+      )}
       {error && (
         <div style={{ color: 'red', border: '1px solid red', padding: '10px', borderRadius: '5px' }}>
           <p>⚠️ Ops! {error}</p>
@@ -139,6 +150,7 @@ function App() {
           titolo={task.titolo}
           completato={task.completato}
           onToggle={toggleTask}
+          onDelete={deleteTask}
         />
       ))}
     </div>
