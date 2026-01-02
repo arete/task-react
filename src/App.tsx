@@ -1,4 +1,4 @@
-import { useState } from 'react'
+import { useState,useEffect } from 'react'
 import reactLogo from './assets/react.svg'
 import viteLogo from '/vite.svg'
 import './App.css'
@@ -14,11 +14,14 @@ interface Task {
   completato: boolean
   }
 
+interface ApiTask {
+  userId: number;
+  id: number;
+  title: string;
+  completed: boolean;
+}
 
 function App() {
-  
-  //funzione per aggiungere un nuovo task
-
   // Funzione per aggiungere una task
   const addTask = (titolo: string) => {
     const nuovaTask: Task = {
@@ -39,7 +42,36 @@ function App() {
       t.id === id ? { ...t, completato: !t.completato } : t
     ));
   };
+  const [loading, setLoading] = useState<boolean>(true); 
+  useEffect(() => {
+    // Funzione asincrona per recuperare i dati
+    const fetchTasks = async () => {
+      try {
+        const response = await fetch('https://jsonplaceholder.typicode.com/todos?_limit=5');
+        const data: ApiTask[] = await response.json();
+        
+        // Trasformiamo i dati dell'API nel nostro formato Task
+        const mappedTasks: Task[] = data.map(t => ({
+          id: t.id,
+          titolo: t.title,
+          completato: t.completed
+        }));
 
+        setTasks(mappedTasks);
+      } catch (error) {
+        console.error("Errore nel caricamento:", error);
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchTasks();
+  }, []); // Array vuoto = esegui solo una volta al montaggio del componente
+
+  
+
+  
+if (loading) return <p>Caricamento in corso...</p>;
   return (
   
     <div style={{ padding: '20px' }}>
