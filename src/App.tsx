@@ -3,6 +3,10 @@ import reactLogo from './assets/react.svg'
 import viteLogo from '/vite.svg'
 import './App.css'
 import {TaskItem } from "./TaskItem"
+import { TaskForm } from './TaskForm' // Importa il nuovo component
+
+
+
 
 interface Task {
   id: number,
@@ -12,7 +16,19 @@ interface Task {
 
 
 function App() {
-  const [count, setCount] = useState(0)
+  
+  //funzione per aggiungere un nuovo task
+
+  // Funzione per aggiungere una task
+  const addTask = (titolo: string) => {
+    const nuovaTask: Task = {
+      id: Date.now(), // Usiamo il timestamp come ID univoco
+      titolo: titolo,
+      completato: false
+    };
+    setTasks([...tasks, nuovaTask]); // Creiamo un nuovo array con la nuova task
+  };
+  
   //inizializziamo lo stato con una lista di task
   const [tasks,setTasks] = useState<Task[]>([
     { id: 1, titolo: "Imparare React", completato: false },
@@ -28,6 +44,9 @@ function App() {
   
     <div style={{ padding: '20px' }}>
       <h1>Le mie Task</h1>
+      {/* Usiamo il nuovo form */}
+      <TaskForm onAddTask={addTask} /> 
+
       {tasks.map(task => (
         <TaskItem 
           key={task.id}
