@@ -1,8 +1,8 @@
-import { useState,useEffect } from 'react'
+import { useState, useEffect } from 'react'
 import reactLogo from './assets/react.svg'
 import viteLogo from '/vite.svg'
 import './App.css'
-import {TaskItem } from "./TaskItem"
+import { TaskItem } from "./TaskItem"
 import { TaskForm } from './TaskForm' // Importa il nuovo component
 
 
@@ -10,9 +10,9 @@ import { TaskForm } from './TaskForm' // Importa il nuovo component
 
 interface Task {
   id: number,
-  titolo:string,
+  titolo: string,
   completato: boolean
-  }
+}
 
 interface ApiTask {
   userId: number;
@@ -22,6 +22,8 @@ interface ApiTask {
 }
 
 function App() {
+  const [error, setError] = useState<string | null>(null); // Stato per l'errore
+
   // Funzione per aggiungere una task
   const addTask = (titolo: string) => {
     const nuovaTask: Task = {
@@ -31,25 +33,30 @@ function App() {
     };
     setTasks([...tasks, nuovaTask]); // Creiamo un nuovo array con la nuova task
   };
-  
+
   //inizializziamo lo stato con una lista di task
-  const [tasks,setTasks] = useState<Task[]>([
+  const [tasks, setTasks] = useState<Task[]>([
     { id: 1, titolo: "Imparare React", completato: false },
     { id: 2, titolo: "Configurare Docker", completato: true }
-  ]);   
+  ]);
   const toggleTask = (id: number) => {
-    setTasks(tasks.map(t => 
+    setTasks(tasks.map(t =>
       t.id === id ? { ...t, completato: !t.completato } : t
     ));
   };
-  const [loading, setLoading] = useState<boolean>(true); 
+  const [loading, setLoading] = useState<boolean>(true);
   useEffect(() => {
     // Funzione asincrona per recuperare i dati
     const fetchTasks = async () => {
       try {
+        setError(null); // Resetta l'errore prima di ogni tentativo
         const response = await fetch('https://jsonplaceholder.typicode.com/todos?_limit=5');
+        // Controllo se la risposta è ok (status 200-299)
+        if (!response.ok) {
+          throw new Error(`Errore del server: ${response.status}`);
+        }
         const data: ApiTask[] = await response.json();
-        
+
         // Trasformiamo i dati dell'API nel nostro formato Task
         const mappedTasks: Task[] = data.map(t => ({
           id: t.id,
@@ -59,7 +66,11 @@ function App() {
 
         setTasks(mappedTasks);
       } catch (error) {
-        console.error("Errore nel caricamento:", error);
+        if (error instanceof Error) {
+          setError(error.message);
+        } else {
+          setError("Si è verificato un errore imprevisto.");
+        }
       } finally {
         setLoading(false);
       }
@@ -68,19 +79,25 @@ function App() {
     fetchTasks();
   }, []); // Array vuoto = esegui solo una volta al montaggio del componente
 
-  
 
-  
-if (loading) return <p>Caricamento in corso...</p>;
+
+
+  if (loading) return <p>Caricamento in corso...</p>;
   return (
-  
+
     <div style={{ padding: '20px' }}>
       <h1>Le mie Task</h1>
+      {error && (
+        <div style={{ color: 'red', border: '1px solid red', padding: '10px', borderRadius: '5px' }}>
+          <p>⚠️ Ops! {error}</p>
+          <button onClick={() => window.location.reload()}>Riprova</button>
+        </div>
+      )}
       {/* Usiamo il nuovo form */}
-      <TaskForm onAddTask={addTask} /> 
+      <TaskForm onAddTask={addTask} />
 
       {tasks.map(task => (
-        <TaskItem 
+        <TaskItem
           key={task.id}
           id={task.id}
           titolo={task.titolo}
@@ -89,7 +106,7 @@ if (loading) return <p>Caricamento in corso...</p>;
         />
       ))}
     </div>
-  
+
   )
 }
 
