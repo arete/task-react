@@ -1,7 +1,7 @@
 
 import { taskService } from '../services/api';
 import { useState, useEffect } from 'react';
-import type { Task, ApiTask } from '../interfaces/Task';
+import type { Task } from '../interfaces/Task';
 
 export const useTasks = () => {
 

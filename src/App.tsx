@@ -12,7 +12,7 @@ import { TaskDetailPage } from "./Pages/TaskDetailPage"
 import { useTasks } from "./hooks/useTask"
 
 function App() {
-  const { tasks, addTask, toggleTask, deleteTask, loading, error } = useTasks();
+  const { tasks } = useTasks();
 
   return (
     <div>
@@ -26,7 +26,7 @@ function App() {
         <div className="max-w-md mx-auto">
           <Routes>
             {/* Pagina Principale (Task List) */}
-            <Route path="/" element={<HomePage tasks={tasks} />} />
+            <Route path="/" element={<HomePage />} />
             {/* Pagina About */}
             <Route path="/about" element={<AboutPage />} />
             {/* Rotta dinamica: :id può essere qualsiasi numero */}
