@@ -4,15 +4,18 @@ import viteLogo from '/vite.svg'
 import './App.css'
 // Importa il nuovo component
 
-
+import { useContext } from 'react'
 import { Route, Routes, Link } from "react-router-dom"
 import { AboutPage } from "./Pages/AboutPage"
 import { HomePage } from "./Pages/HomePage"
 import { TaskDetailPage } from "./Pages/TaskDetailPage"
 import { useTasks } from "./hooks/useTask"
+import { useAuthContext } from './context/AuthContext'
+import { Login } from './components/Login'
 
 function App() {
   const { tasks } = useTasks();
+  const { user } = useAuthContext();
 
   return (
     <div>
@@ -25,6 +28,8 @@ function App() {
       <div className="min-h-screen py-12 px-4">
         <div className="max-w-md mx-auto">
           <Routes>
+            {/* Pagina con login  */}
+            <Route path="/user" element={!user ? <Login /> : <HomePage />} />
             {/* Pagina Principale (Task List) */}
             <Route path="/" element={<HomePage />} />
             {/* Pagina About */}
