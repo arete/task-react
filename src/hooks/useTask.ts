@@ -1,5 +1,4 @@
-
-import { taskService } from '../services/api';
+import { supabase } from '../services/supabaseClient';
 import { useState, useEffect } from 'react';
 import type { Task } from '../interfaces/Task';
 
@@ -13,18 +12,35 @@ export const useTasks = () => {
     const [error, setError] = useState<string | null>(null);
     // Funzione per aggiungere una task
     const addTask = async (titolo: string) => {
-        const nuovaTask = await taskService.create(titolo);
-        setTasks([...tasks, nuovaTask]); // Creiamo un nuovo array con la nuova task
+        const { data, error } = await supabase
+            .from('tasks')
+            .insert([{ titolo, completato: false }])
+            .select(); // Restituisce la task creata con l'ID vero del DB
+
+        if (!error && data) {
+            setTasks([data[0], ...tasks]);
+        }
     };
-    const toggleTask = (id: number) => {
-        setTasks(tasks.map(t =>
-            t.id === id ? { ...t, completato: !t.completato } : t
-        ));
+
+    const toggleTask = async (id: number, completato: boolean) => {
+        const { error } = await supabase
+            .from('tasks')
+            .update({ completato: !completato })
+            .eq('id', id);
+
+        if (!error) {
+            setTasks(tasks.map(t => t.id === id ? { ...t, completato: !completato } : t));
+        }
     };
     const deleteTask = async (id: number) => {
-        await taskService.delete(id);
-        // Teniamo solo le task che NON hanno l'ID che vogliamo eliminare
-        setTasks(tasks.filter(task => task.id !== id));
+        const { error } = await supabase
+            .from('tasks')
+            .delete()
+            .eq('id', id);
+
+        if (!error) {
+            setTasks(tasks.filter(t => t.id !== id));
+        }
     };
 
     useEffect(() => {
@@ -32,10 +48,19 @@ export const useTasks = () => {
             setLoading(false);
             return;
         }
-        taskService.getAll().then(data => {
-            const mapped = data.map((t: any) => ({ id: t.id, titolo: t.title, completata: t.completed }));
-            setTasks(mapped);
-        });
+        const fetchTasks = async () => {
+            setLoading(true);
+            const { data, error } = await supabase
+                .from('tasks')
+                .select('*')
+                .order('created_at', { ascending: false });
+
+            if (error) setError(error.message);
+            else setTasks(data);
+            setLoading(false);
+        };
+
+        fetchTasks();
     }, []);
 
     // 3. SALVATAGGIO AUTOMATICO: Ogni volta che 'tasks' cambia, scrivi nel LocalStorage

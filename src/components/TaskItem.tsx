@@ -4,7 +4,7 @@ interface TaskProps {
     id: number;
     titolo: string;
     completato: boolean;
-    onToggle: (id: number) => void; // Una funzione che non restituisce nulla
+    onToggle: (id: number, completato: boolean) => void; // Una funzione che non restituisce nulla
     onDelete: (id: number) => void; // Aggiungiamo questa riga
 }
 
@@ -15,7 +15,7 @@ export const TaskItem = ({ id, titolo, completato, onToggle, onDelete }: TaskPro
                 <input
                     type="checkbox"
                     checked={completato}
-                    onChange={() => onToggle(id)}
+                    onChange={() => onToggle(id, completato)}
                     className="w-5 h-5 text-indigo-600 rounded focus:ring-indigo-500 cursor-pointer"
                 />
                 <Link to={`/task/${id}`} className="hover:text-indigo-600 transition-colors">

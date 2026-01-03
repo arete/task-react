@@ -13,7 +13,7 @@ interface TaskContextType {
     setFilter: (f: FilterStatus) => void;
     addTask: (titolo: string) => void;
     deleteTask: (id: number) => void;
-    toggleTask: (id: number) => void;
+    toggleTask: (id: number, completato: boolean) => void;
     loading: boolean;
 }
 
