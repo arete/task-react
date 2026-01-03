@@ -1,4 +1,4 @@
-export default function AboutPage() {
+export function AboutPage() {
     return (
         <div className="text-center p-6 bg-white rounded-xl shadow">
             <h2 className="text-xl font-bold mb-2">Info App</h2>

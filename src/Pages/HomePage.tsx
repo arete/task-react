@@ -1,10 +1,16 @@
-import { TaskItem } from "../componets/TaskItem"
+import type { Task } from '../interfaces/Task';
+import { TaskItem } from '../componets/TaskItem'
 import { TaskForm } from '../componets/TaskForm'
 import { useTasks } from "../hooks/useTask"
 
+interface Props {
+    tasks: Task[];
+}
 
-export default function HomePage() {
-    const { tasks, addTask, toggleTask, deleteTask, loading, error } = useTasks();
+
+export const HomePage = ({ tasks }: Props) => {
+    const { addTask, toggleTask, deleteTask, loading, error } = useTasks();
+
     return (
         <>
             <header className="mb-10 text-center">

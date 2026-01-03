@@ -6,13 +6,13 @@ import './App.css'
 
 
 import { Route, Routes, Link } from "react-router-dom"
-import AboutPage from "./Pages/AboutPage"
-import HomePage from "./Pages/HomePage"
-
-
+import { AboutPage } from "./Pages/AboutPage"
+import { HomePage } from "./Pages/HomePage"
+import { TaskDetailPage } from "./Pages/TaskDetailPage"
+import { useTasks } from "./hooks/useTask"
 
 function App() {
-
+  const { tasks, addTask, toggleTask, deleteTask, loading, error } = useTasks();
 
   return (
     <div>
@@ -26,10 +26,11 @@ function App() {
         <div className="max-w-md mx-auto">
           <Routes>
             {/* Pagina Principale (Task List) */}
-            <Route path="/" element={<HomePage />} />
+            <Route path="/" element={<HomePage tasks={tasks} />} />
             {/* Pagina About */}
             <Route path="/about" element={<AboutPage />} />
-
+            {/* Rotta dinamica: :id può essere qualsiasi numero */}
+            <Route path="/task/:id" element={<TaskDetailPage tasks={tasks} />} />
           </Routes>
         </div>
       </div>

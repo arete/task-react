@@ -1,3 +1,4 @@
+import { Link } from 'react-router-dom';
 // Definiamo la struttura dei dati
 interface TaskProps {
     id: number;
@@ -17,6 +18,11 @@ export const TaskItem = ({ id, titolo, completato, onToggle, onDelete }: TaskPro
                     onChange={() => onToggle(id)}
                     className="w-5 h-5 text-indigo-600 rounded focus:ring-indigo-500 cursor-pointer"
                 />
+                <Link to={`/task/${id}`} className="hover:text-indigo-600 transition-colors">
+                    <span className={`text-lg ${completato ? 'line-through text-slate-400' : 'text-slate-700'}`}>
+                        {titolo}
+                    </span>
+                </Link>
                 <span className={`text-lg ${completato ? 'line-through text-slate-400' : 'text-slate-700'}`}>
                     {titolo}
                 </span>
