@@ -1,3 +1,5 @@
+version: "3.8"
+name: react-supabase
 services:
   app:
     image: node:20-alpine
@@ -8,5 +10,66 @@ services:
       - "5173:5173"
     command: sh -c "npm install && npm run dev -- --host"
     environment:
-      - WATCHPACK_POLLING=true # Necessario per far sentire le modifiche ai file su alcuni sistemi
-      
+      WATCHPACK_POLLING: true 
+      VITE_SUPABASE_URL: ${SUPABASE_URL}
+      VITE_SUPABASE_ANON_KEY: ${ANON_KEY}
+    depends_on:
+     - supabase_studio
+  db:
+    image: supabase/postgres:15.8.1.085
+    container_name: supabase_db
+    environment:
+      POSTGRES_HOST: /var/run/postgresql
+      PGPORT: ${POSTGRES_PORT}
+      POSTGRES_PORT: ${POSTGRES_PORT}
+      PGPASSWORD: ${POSTGRES_PASSWORD}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
+      PGDATABASE: ${POSTGRES_DB}
+      POSTGRES_DB: ${POSTGRES_DB}      
+      JWT_SECRET: ${JWT_SECRET}
+      JWT_EXP: ${JWT_EXPIRY}
+    ports:
+      - "5432:5432"
+    volumes:
+      - db_data:/var/lib/postgresql/data  
+  pg-meta:
+    image: supabase/postgres-meta:v0.95.1
+    container_name: supabase_pg_meta
+    environment:
+      PG_META_PORT: 8080
+      PG_META_DB_HOST: ${POSTGRES_HOST}
+      PG_META_DB_PORT: ${POSTGRES_PORT}
+      PG_META_DB_NAME: ${POSTGRES_DB}
+      PG_META_DB_USER: supabase_admin
+      PG_META_DB_PASSWORD: ${POSTGRES_PASSWORD}
+      CRYPTO_KEY: ${PG_META_CRYPTO_KEY}
+    ports:
+     - "8000:8080"
+    depends_on:
+      - db
+
+  :
+    image: supabase/studio:2025.12.17-sha-43f4f7f
+    container_name: supabase_studio
+    environment:
+      HOSTNAME: "::"
+      SUPABASE_URL: http://localhost:5431
+      STUDIO_PG_META_URL: http://pg-meta:8080
+
+      POSTGRES_PORT: ${POSTGRES_PORT}
+      POSTGRES_HOST: ${POSTGRES_HOST}
+      POSTGRES_DB: ${POSTGRES_DB}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
+      PG_META_CRYPTO_KEY: ${PG_META_CRYPTO_KEY}
+      DEFAULT_ORGANIZATION_NAME: ${STUDIO_DEFAULT_ORGANIZATION}
+      DEFAULT_PROJECT_NAME: ${STUDIO_DEFAULT_PROJECT}
+      SUPABASE_ANON_KEY: ${ANON_KEY}
+      SUPABASE_SERVICE_KEY: ${SERVICE_ROLE_KEY}
+      AUTH_JWT_SECRET: ${JWT_SECRET}
+    ports:
+      - "5431:3000"
+    depends_on:
+      - db
+volumes:
+  db_data:
+
